@@ -1,12 +1,12 @@
 <?php
 
-namespace Hascamp\Client\Models;
+namespace Hascamp\Client\Resources;
 
 use Closure;
 use Illuminate\Support\Facades\DB;
-use Hascamp\Client\Models\UserClient;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
+use Hascamp\Client\Resources\UserClient;
 
 class User extends DataModel implements Modelable
 {

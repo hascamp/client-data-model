@@ -1,8 +1,8 @@
 <?php
 
-namespace Hascamp\Client\Models;
+namespace Hascamp\Client\Resources;
 
-use Hascamp\Client\Models\Platform;
+use Hascamp\Client\Resources\Platform;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
 

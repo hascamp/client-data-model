@@ -1,9 +1,9 @@
 <?php
 
-namespace Hascamp\Client\Models;
+namespace Hascamp\Client\Resources;
 
 use Spatie\LaravelData\Optional;
-use Hascamp\Client\Models\Business;
+use Hascamp\Client\Resources\Business;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
 

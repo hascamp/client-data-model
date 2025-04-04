@@ -1,6 +1,6 @@
 <?php
 
-namespace Hascamp\Client\Models;
+namespace Hascamp\Client\Resources;
 
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
