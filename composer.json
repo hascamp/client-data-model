@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "hascamp/ems-client-model",
+    "name": "hascamp/client-data-model",
     "version": "1.0.0",
     "type": "library",
     "description": "Laravel Model Management for EMS App License.",
