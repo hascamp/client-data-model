@@ -1,0 +1,47 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "hascamp/ems-client-model",
+    "version": "1.0.0",
+    "type": "library",
+    "description": "Laravel Model Management for EMS App License.",
+    "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "F:/Repositories/farizhuzairi/jet-request"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/farizhuzairi/ems-client-model/issues",
+        "source": "https://github.com/farizhuzairi/ems-client-model"
+    },
+    "authors": [
+        {
+            "name": "Fariz Huzairi",
+            "email": "farizhuzairi@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "farizhuzairi/jet-request": "1.x-dev",
+        "spatie/laravel-data": "^4.13"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hascamp\\Client\\": "src/"
+        }
+    },
+    
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hascamp\\Client\\ClientDataModelServiceProvider"
+            ]
+        }
+    },
+
+    "minimum-stability": "dev"
+}

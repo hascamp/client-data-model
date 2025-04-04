@@ -1,0 +1,12 @@
+/vendor
+.env
+auth.json
+composer.lock
+/node_modules
+package-lock.json
+phpunit.xml.bak
+workbench
+testbench.yaml
+.phpunit.cache
+tests
+phpunit.xml
