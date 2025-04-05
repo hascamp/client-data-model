@@ -19,7 +19,7 @@ class Request implements Requestion
     /** @var \Hascamp\Direction\Contracts\Accessible */
     protected static $accessible;
 
-    /** @var \Closure */
+    /** @var \Closure|array */
     protected $headers = [];
 
     public function setHeader(Closure $headers): void
@@ -27,7 +27,7 @@ class Request implements Requestion
         $this->headers = $headers;
     }
 
-    private function headers(): Closure
+    private function headers(): Closure|array
     {
         return $this->headers;
     }

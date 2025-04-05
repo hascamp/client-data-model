@@ -25,6 +25,7 @@ class DirectionServiceProvider extends ServiceProvider
     
     public function boot(): void
     {
+        $this->boot_config();
         $this->boot_macro();
         $this->boot_middleware();
     }
@@ -32,8 +33,15 @@ class DirectionServiceProvider extends ServiceProvider
     private function register_config(): void
     {
         $this->mergeConfigFrom(
-            base_path("packages/Hascamp/config/direction.php"), 'direction'
+            __DIR__."/../../config/direction.php", 'direction'
         );
+    }
+
+    private function boot_config(): void
+    {
+        $this->publishes([
+            __DIR__.'/../../config/direction.php' => config_path('direction.php'),
+        ], 'client-data-model');
     }
 
     private function boot_macro(): void

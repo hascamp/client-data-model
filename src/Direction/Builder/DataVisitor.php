@@ -11,7 +11,8 @@ final class DataVisitor extends Data implements ContractsVisitor
     use IgnoreChanges;
     
     public function __construct(
-        public ?string $hspid = null,
+        public string|int|null $id = null,
+        public string|int|null $hspid = null,
         public ?string $name = null,
         public ?string $username = null,
     )

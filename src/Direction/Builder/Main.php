@@ -11,12 +11,16 @@ use Hascamp\Direction\Builder\Services\Visit;
 use Hascamp\Direction\Contracts\Service\Visitable;
 use Hascamp\Direction\Contracts\Service\Requestion;
 use Hascamp\Direction\Exceptions\VisitIdentification;
+use Hascamp\Direction\Builder\Factory\AssetRequestFactory;
 use Hascamp\Direction\Builder\Master\Stream as BuilderApp;
 
 final class Main extends BuilderApp implements Accessible
 {
     /** @var \Hascamp\Direction\Contracts\Service\Visitable */
-    private $visitable;
+    private $visit;
+    
+    /** @var \Hascamp\Direction\Builder\Factory\AssetRequestFactory */
+    private $assetFactory;
 
     public function __construct(Requestion $requestion, array $config)
     {
@@ -28,9 +32,9 @@ final class Main extends BuilderApp implements Accessible
 
     public function visitDirector(Request $request, ?Closure $director): void
     {
-        if ($this->visitable !== null) {
+        if ($this->visit !== null) {
             throw new VisitIdentification(
-                "Visitors are suspected of violating the access policy by exceeding the permitted request limit.",
+                "The visitor is suspected of violating the access policy by exceeding the allowed request limit.",
                 403,
                 [
                     "policy" => "Only one call may be made in one http request cycle."
@@ -38,49 +42,48 @@ final class Main extends BuilderApp implements Accessible
             );
         }
 
-        $visit = new Visit(
+        $factory = new AssetRequestFactory;
+        $this->assetFactory = $factory($this->app(), $request->routeAs()->route(), $request->user()?->hspid);
+
+        $this->visit = new Visit(
             $this->app(),
+            $request,
             $request->user(),
-            $request->routeAs()->route(),
         );
-        
-        $this->ensure_visits($visit);
-        $this->visitable = $visit;
 
         if ($director instanceof Closure) {
             $director($this);
         }
     }
+
+    public function hasVisit(): bool
+    {
+        if (
+            $this->visit?->getVisitor() instanceof Visitor &&
+            $this->visit?->getVisited() instanceof Visited &&
+            $this->assetFactory?->requestPermission()
+        ) {
+            return $this->visit?->getVisitor()?->hspid !== null || $this->visit?->getVisited()?->target !== null;
+        }
+
+        return false;
+    }
     
     public function visitBuilder(): void
     {
-        $this->visitable->setVisitor();
-        $this->visitable->setVisited();
+        $this->visit->setVisitor();
+        $this->visit->setVisited();
 
-        $this->set_visit_access_permission($this->visitable->hasVisit());
-        $this->requestion_optimize();
-    }
-
-    protected function requestion_optimize(): void
-    {
-        $this->requestion->setHeader($this->visitable->headers());
-    }
-
-    public function visitPermission(): bool
-    {
-        return $this->isPermitted;
+        $this->set_visit_access_permission($this->hasVisit());
+        $this->optimize_request_preparation($this->assetFactory->asHeaders(), function ($app) {
+            $this->app = $app; // preset...
+        });
     }
     
     public function visit(): Visitable
     {
-        $this->ensure_visits($this->visitable);
-        return $this->visitable;
-    }
-    
-    public function request(): Requestion
-    {
-        $this->ensure_request($this->requestion);
-        return $this->requestion;
+        $this->ensure_visits($this->visit);
+        return $this->visit;
     }
     
     public function visitor(): Visitor

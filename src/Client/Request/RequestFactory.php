@@ -21,7 +21,7 @@ final class RequestFactory implements DataRequest
         static::$__requestion = $request;
     }
 
-    public function optimize(Closure $headers): void
+    public function optimize(Closure|array $headers): void
     {
         static::$headers = $headers;
     }

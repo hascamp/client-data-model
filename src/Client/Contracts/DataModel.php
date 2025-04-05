@@ -117,4 +117,9 @@ abstract class DataModel extends Data
     {
         return $this->toArray();
     }
+
+    public function getOriginalResults(): array
+    {
+        return $this->original_data_results;
+    }
 }

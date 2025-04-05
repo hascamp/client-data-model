@@ -23,6 +23,8 @@
     "require": {
         "php": "^8.2",
         "farizhuzairi/jet-request": "1.x-dev",
+        "farizhuzairi/routing": "^1.x-dev",
+        "hascamp/laravel-exceptions": "1.0.0",
         "spatie/laravel-data": "^4.13"
     },
     "require-dev": {

@@ -11,15 +11,15 @@ class TrackingVisit
     {
         $request->trackingVisit($request, function ($main) {
             $main->visitBuilder();
-            $main->requestion('setHeaderToResource');
         });
 
         if (! $request->direction()->visitPermission()) {
             abort(403);
         }
 
-        // dd($request->direction()->requestion('ping', 'call.ping:index'));
-        dd(\Hascamp\Client\Resource::data('call.ping:index'));
+        // session()->forget('_BASE_META_IDENTIFIED');
+        // dd(session()->all());
+        dd($request->direction()->request('call.ping:index'));
         return $next($request);
     }
 }

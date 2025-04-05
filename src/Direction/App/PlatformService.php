@@ -7,10 +7,10 @@ use Spatie\LaravelData\Data;
 class PlatformService extends Data
 {
     public function __construct(
-        public readonly string $id = "psid:1",
-        public readonly string $name = "Entriplus",
-        public readonly string $base_license_type_of = "MOL",
-        public readonly bool $is_active = true,
+        public readonly ?string $id = null,
+        public readonly ?string $name = null,
+        public readonly ?string $base_license_type_of = null,
+        public readonly ?bool $is_active = null,
     )
     {}
 }

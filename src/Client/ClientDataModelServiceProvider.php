@@ -13,7 +13,7 @@ class ClientDataModelServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/client-data-model.php', 'client-data-model'
+            __DIR__.'/../../config/client-data-model.php', 'client-data-model'
         );
         
         $this->app->bind(DataRequest::class, function(Application $app) {
@@ -24,7 +24,7 @@ class ClientDataModelServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__.'/../config/client-data-model.php' => config_path('client-data-model.php'),
+            __DIR__.'/../../config/client-data-model.php' => config_path('client-data-model.php'),
         ], 'client-data-model');
     }
 }

@@ -10,6 +10,8 @@ class Ping extends DataModel implements Modelable
     public function __construct(
         public readonly array $connection = [],
         public readonly array $documentations = [],
+        public readonly array $base = [],
+        public readonly array $platform_service = [],
     )
     {
         parent::__construct();

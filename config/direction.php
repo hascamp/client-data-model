@@ -3,7 +3,7 @@
 return [
 
     "services" => [
-        "app" => \Hascamp\Direction\Builder\Services\ClientApplication::class,
+        "app" => \Hascamp\Direction\Builder\Services\BaseApplication::class,
     ],
 
     'license_key' => env("X_LICENSE_KEY", null),
