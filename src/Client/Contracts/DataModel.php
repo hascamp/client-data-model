@@ -10,21 +10,21 @@ use Illuminate\Support\Facades\Log;
 
 abstract class DataModel extends Data
 {
+    protected array $dataForm = [];
+    protected array $headers = [];
+
     public function __construct(
         protected bool $successful = false,
         protected int $statusCode = 500,
-        protected string $message = "There was a problem with the internal server."
+        protected string $message = "There was a problem with the internal server.",
     )
-    {
-        //
-    }
+    {}
 
-    /**
-     * Data Form Request
-     * 
-     * @var array
-     */
-    protected static $dataForm = [];
+    public function requestion($data, $headers)
+    {
+        $this->dataForm = $data;
+        $this->headers = $headers;
+    }
 
     /**
      * Original Data Results
@@ -32,21 +32,15 @@ abstract class DataModel extends Data
      * @var array
      */
     protected array $original_data_results = [];
-
-    protected function setDataForm(array $data): void
-    {
-        static::$dataForm = $data;
-    }
-
-    public function getDataForm(): array
-    {
-        return static::$dataForm;
-    }
     
-    final protected static function connection(Closure $request, ?Closure $results = null): static
+    final protected function connection(string $method, string $url = "", ?Closure $results = null): static
     {
-        $response = Client::request($request);
-        dd($response);
+        $response = Client::request($this->dataForm, function ($request) use ($method, $url) {
+            $request
+            ->method($method)
+            ->url($url)
+            ->header($this->headers);
+        });
 
         $_dataResults = function (array $results) {
             if (count($results) === 1 && isset($results['results'])) {

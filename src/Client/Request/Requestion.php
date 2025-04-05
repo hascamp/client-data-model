@@ -3,6 +3,7 @@
 namespace Hascamp\Client\Request;
 
 use Closure;
+use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
 
 final class Requestion
@@ -28,9 +29,7 @@ final class Requestion
 
     public function setConfig(array $config): void
     {
-        if (isset($config['root_model'])) {
-            static::$__rootModel = $config['root_model'];
-        }
+        static::$__rootModel = $config['resource_namespace'] ?? "";
     }
 
     public function model(): ?string
@@ -77,15 +76,6 @@ final class Requestion
         return $modelable;
     }
 
-    public function hasRequest(string $method): bool
-    {
-        if (! method_exists($this->model, $method) && $method !== $this->method) {
-            throw new \Exception("Error Processing Request: {$method} method not found in {$this->model}.");
-        }
-
-        return true;
-    }
-
     private function event_Convertion(string $event): ?array
     {
         $explode = explode(':', strtolower($event));
@@ -123,23 +113,18 @@ final class Requestion
         return $this;
     }
 
-    public function request(array $data, Closure|string $factory): Modelable
+    public function request(array $data, array $headers): Modelable
     {
-        $method = null;
-
-        if ($factory instanceof Closure) {
-            $method = $factory($this);
-        }
-
-        if (is_string($factory)) {
-            if(method_exists($this, $factory)) {
-                $method = $this->{$factory}();
-            }
-        }
-
         try {
-            $this->hasRequest($method);
-            return $this->model()::{$this->method()}($data);
+
+            $instance = new $this->model();
+            if (! $instance instanceof DataModel) {
+                throw new \Exception("Error Processing Request: {$this->model()} invalid model.");
+            }
+
+            $instance->requestion($data, $headers);
+            return $instance->{$this->method()}();
+            
         } finally {
             $this->__reset();
         }
@@ -149,11 +134,5 @@ final class Requestion
     {
         $this->model = null;
         $this->method = null;
-    }
-
-    public function __call(string $method, array $data): Modelable
-    {
-        $this->hasRequest($method);
-        return $this->request($data, 'method');
     }
 }

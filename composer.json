@@ -30,14 +30,16 @@
     },
     "autoload": {
         "psr-4": {
-            "Hascamp\\Client\\": "src/"
+            "Hascamp\\Client\\": "src/Client/",
+            "Hascamp\\Direction\\": "src/Direction/"
         }
     },
     
     "extra": {
         "laravel": {
             "providers": [
-                "Hascamp\\Client\\ClientDataModelServiceProvider"
+                "Hascamp\\Client\\ClientDataModelServiceProvider",
+                "Hascamp\\Direction\\DirectionServiceProvider"
             ]
         }
     },
