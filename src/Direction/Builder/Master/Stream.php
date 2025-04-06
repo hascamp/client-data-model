@@ -66,7 +66,7 @@ abstract class Stream
         $this->isPermitted = $access;
     }
 
-    final public function visitPermission(): bool
+    public function visitPermission(): bool
     {
         return $this->isPermitted;
     }
@@ -92,7 +92,7 @@ abstract class Stream
         return $instanceRequest;
     }
 
-    protected function optimize_request_preparation(Closure $app): void
+    protected function optimize_request_preparation(): void
     {
         $hasDataModel = function (bool $has) {
             if ($has) {
@@ -102,10 +102,7 @@ abstract class Stream
         };
 
         if ($this->request(call:'setHeaderToResource')) {
-            $this->app->pingInitialized(
-                $hasDataModel($this->app->hasMetaIdentified()),
-                $app
-            );
+            $this->app->pingInitialized($hasDataModel($this->app->hasMetaIdentified()));
         }
     }
 

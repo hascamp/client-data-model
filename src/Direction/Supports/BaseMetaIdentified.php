@@ -52,6 +52,6 @@ trait BaseMetaIdentified
 
     public function getMetaIdentified(): array
     {
-        return session(static::META_IDENTIFIED, []);
+        return session(static::META_IDENTIFIED);
     }
 }

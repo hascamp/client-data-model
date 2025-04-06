@@ -79,7 +79,7 @@ class BaseApplication implements BasePlatform
         return null;
     }
 
-    public function pingInitialized(DataModel|array $ping, Closure $app): void
+    public function pingInitialized(DataModel|array $ping): void
     {
         $originalResults = null;
 
@@ -102,8 +102,6 @@ class BaseApplication implements BasePlatform
             static::$base = Base::from($meta['base']);
             static::$platformService = PlatformService::from($meta['platform_service']);
         }
-
-        $app($this);
     }
 
     public function base(): Base
@@ -125,7 +123,7 @@ class BaseApplication implements BasePlatform
     {
         $result = $base->initial;
         $result .= "/{$base->version}";
-        $result .= " Released:{$base->release_id} ";
+        $result .= " (Released:{$base->release_id}) ";
         $result .= str_replace(' ', '', $platformService->name) . "/{$platformService->base_license_type_of}";
 
         return (string) $result;

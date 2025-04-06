@@ -8,11 +8,11 @@ class Base extends Data
 {
     public function __construct(
         public readonly ?string $id = null,
-        public readonly ?string $name = null,
-        public readonly ?string $initial = null,
-        public readonly ?string $type_of = null,
-        public readonly ?string $release_id = null,
-        public readonly ?string $version = null,
+        public readonly ?string $name = "Ekatalog Marketing Studio",
+        public readonly ?string $initial = "EMS",
+        public readonly ?string $type_of = "run",
+        public readonly ?string $release_id = "0",
+        public readonly ?string $version = "0",
         public readonly int $vin = 0,
     )
     {}

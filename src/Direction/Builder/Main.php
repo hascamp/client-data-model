@@ -34,11 +34,23 @@ final class Main extends BuilderApp implements Accessible
             );
         }
 
-        $routeName = $request->routeAs()?->route() ?? $request->route()->action['as'];
+        $routeName = function ($request) {
+            $result = $request->routeAs()?->route();
+
+            if (! $result) {
+                $result = $request->route()->action['as'];
+
+                if (! in_array($result, static::$config['routes_allowed'])) {
+                    return null;
+                }
+            }
+
+            return $result;
+        };
 
         $this->visit = new Visit(
             $this->app(),
-            $routeName,
+            $routeName($request),
             $request->user(),
         );
 
@@ -53,9 +65,7 @@ final class Main extends BuilderApp implements Accessible
         $this->visit->setVisited();
 
         $this->set_visit_access_permission($this->hasVisit());
-        $this->optimize_request_preparation(function ($app) {
-            $this->app = $app; // preset...
-        });
+        $this->optimize_request_preparation();
     }
 
     public function hasVisit(): bool
