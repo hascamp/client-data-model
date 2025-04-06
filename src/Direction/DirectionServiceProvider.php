@@ -19,7 +19,7 @@ class DirectionServiceProvider extends ServiceProvider
         $this->register_config();
 
         $this->app->scoped(Accessible::class, function (Application $app) {
-            return new Main(new ServicesRequest, $app->config['direction']);
+            return new Main(ServicesRequest::class, $app->config['direction']);
         });
     }
     

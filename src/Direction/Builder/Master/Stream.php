@@ -24,11 +24,18 @@ abstract class Stream
     /** @var bool */
     protected $isPermitted = false;
 
+    /** @var string */
+    protected $requestion;
+
+    /** @var \Hascamp\Direction\Contracts\Service\Visitable */
+    protected $visit;
+
     public function __construct(
-        protected readonly Requestion $requestion,
+        string $requestion,
         array $config
     )
     {
+        $this->requestion = $requestion;
         $this->set_config($config);
         $this->has_client_environment($config);
     }
@@ -59,7 +66,7 @@ abstract class Stream
         $this->isPermitted = $access;
     }
 
-    public function visitPermission(): bool
+    final public function visitPermission(): bool
     {
         return $this->isPermitted;
     }
@@ -73,20 +80,20 @@ abstract class Stream
         return true;
     }
 
-    protected function ensure_request($requestion): bool
+    protected function instanceRequest(): Requestion
     {
-        if (! $requestion instanceof Requestion) {
+        $instanceRequest = new $this->requestion;
+
+        if (! $instanceRequest instanceof Requestion) {
             throw new RequestionFailed("Unable to handle client request.");
         }
 
-        return true;
+        $instanceRequest->setHeader($this->visit->getAssetFactory()->asHeaders());
+        return $instanceRequest;
     }
 
-    protected function optimize_request_preparation(Closure $headers, Closure $app): void
+    protected function optimize_request_preparation(Closure $app): void
     {
-        $this->ensure_request($this->requestion);
-        $this->requestion->setHeader($headers);
-
         $hasDataModel = function (bool $has) {
             if ($has) {
                 return $this->app->getMetaIdentified();
@@ -109,8 +116,7 @@ abstract class Stream
 
     public function request(string $event = "", array $data = [], string $call = "resource"): DataModel|bool
     {
-        $this->ensure_request($this->requestion);
-        $request = $this->requestion;
-        return $request(request(), $this, $call, $event, $data);
+        $request = $this->instanceRequest();
+        return $request($this, $call, $event, $data);
     }
 }

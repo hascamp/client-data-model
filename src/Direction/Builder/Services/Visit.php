@@ -9,8 +9,8 @@ use Hascamp\Direction\Contracts\Visitor;
 use Hascamp\Direction\Builder\DataVisited;
 use Hascamp\Direction\Builder\DataVisitor;
 use Hascamp\Direction\Contracts\Service\Visitable;
+use Hascamp\Direction\Builder\Factory\AssetRequestFactory;
 use Hascamp\Direction\Contracts\Service\Platform\BasePlatform;
-use Illuminate\Http\Request;
 
 class Visit implements Visitable
 {
@@ -21,8 +21,8 @@ class Visit implements Visitable
     protected $visited;
 
     public function __construct(
-        private BasePlatform $base,
-        private Request $http,
+        private BasePlatform $app,
+        private ?string $routeName,
         private ?User $user,
     )
     {}
@@ -40,7 +40,7 @@ class Visit implements Visitable
     public function setVisited(): void
     {
         $this->visited = DataVisited::from([
-            'target' => $this->http?->routeAs()?->route(), // sementara dalam pengujian ...
+            'target' => $this->routeName, // sementara dalam pengujian ...
             'targetId' => null,
             'visitAs' => null,
             'visitAsId' => $this->user?->hspid,
@@ -56,5 +56,11 @@ class Visit implements Visitable
     public function getVisited(): Visited
     {
         return $this->visited;
+    }
+
+    public function getAssetFactory(): AssetRequestFactory
+    {
+        $factory = new AssetRequestFactory;
+        return $factory($this->app, $this->routeName, $this->user?->hspid);
     }
 }

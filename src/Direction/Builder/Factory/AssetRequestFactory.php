@@ -16,23 +16,15 @@ final class AssetRequestFactory
     private $assets;
 
     /** @var bool */
-    private static $requestPermission = false;
+    private $requestPermission = false;
 
-    public function __invoke(BasePlatform $base, string $routeName, ?string $hspid)
+    public function __invoke(BasePlatform $app, ?string $routeName, ?string $hspid)
     {
-        if (static::$self instanceof AssetRequestFactory) {
-            report(new AssetRequestFactoryIdentifier("Instantiating ".__CLASS__." more than once."));
-            throw new VisitIdentification(
-                "The request cannot be continued. The visitor is suspected of violating the access policy by exceeding the allowed request limit.",
-                403,
-                [
-                    "policy" => "Duplicate requests for instant access in the same cycle."
-                ]
-            );
+        if (! static::$self instanceof AssetRequestFactory) {
+            static::$self = new self();
         }
 
-        static::$self = new self();
-        static::$self->assets = new AssetRequest($base);
+        static::$self->assets = new AssetRequest($app);
         static::$self->assets->createRequestId($routeName, $hspid);
         static::$self->assets->createTraceId($routeName);
         $this->set_request_permission();
@@ -46,18 +38,18 @@ final class AssetRequestFactory
             static::$self?->assets?->hasRequestId() &&
             static::$self?->assets?->hasTraceId()
         ) {
-            static::$requestPermission = true;
+            $this->requestPermission = true;
         }
 
         else {
-            static::$requestPermission = false;
+            $this->requestPermission = false;
         }
     }
 
     public function requestPermission(): bool
     {
         $this->set_request_permission();
-        return static::$requestPermission;
+        return $this->requestPermission;
     }
 
     public function requestId(): string

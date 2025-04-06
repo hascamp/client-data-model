@@ -21,9 +21,10 @@ final class RequestFactory implements DataRequest
         static::$__requestion = $request;
     }
 
-    public function optimize(Closure|array $headers): void
+    public function optimize(Closure|array $headers): static
     {
         static::$headers = $headers;
+        return $this;
     }
 
     public function data(string $event, array $data = []): Modelable

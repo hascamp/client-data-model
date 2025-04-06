@@ -3,21 +3,17 @@
 namespace Hascamp\Direction\Builder\Services;
 
 use Closure;
+use Hascamp\Client\Resource;
+use Hascamp\Client\Contracts\DataModel;
+use Hascamp\Client\Contracts\DataRequest;
 use Hascamp\Direction\Contracts\Accessible;
-use Illuminate\Http\Request as HttpRequest;
-use Hascamp\Direction\Supports\CallableRequest;
 use Hascamp\Direction\Exceptions\RequestionFailed;
 use Hascamp\Direction\Contracts\Service\Requestion;
 
 class Request implements Requestion
 {
-    use CallableRequest;
-    
-    /** @var \Illuminate\Http\Request */
-    protected static $http;
-
     /** @var \Hascamp\Direction\Contracts\Accessible */
-    protected static $accessible;
+    protected $accessible;
 
     /** @var \Closure|array */
     protected $headers = [];
@@ -32,24 +28,34 @@ class Request implements Requestion
         return $this->headers;
     }
 
-    public function __invoke(HttpRequest $request, Accessible $accessible, string $call, string $event, array $data)
+    public function __invoke(Accessible $accessible, string $call, string $event, array $data)
     {
         if (! method_exists($this, $call)) {
             throw new RequestionFailed("{$call} not Found.");
         }
 
         try {
-            static::$http = $request;
-            static::$accessible = $accessible;
+            $this->accessible = $accessible;
             return $this->{$call}($event, $data);
         } finally {
-            $this->presets();
+            $this->accessible = null;
         }
     }
 
-    private function presets(): void
+    private function setHeaderToResource(): bool
     {
-        static::$http = null;
-        static::$accessible = null;
+        try {
+            $dataRequest = Resource::optimize($this->headers());
+            return $dataRequest instanceof DataRequest;
+        } catch (\Throwable $e) {
+            report(new RequestionFailed($e->getMessage()));
+        }
+
+        return false;
+    }
+
+    private function resource(string $event, array $data): DataModel
+    {
+        return Resource::data($event, $data);
     }
 }

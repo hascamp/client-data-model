@@ -9,11 +9,6 @@ trait BaseMetaIdentified
     private const META_IDENTIFIED = "_BASE_META_IDENTIFIED";
     private static $_UPDATE = false;
 
-    private function reset_meta_identified(): void
-    {
-        session()->forget(static::META_IDENTIFIED);
-    }
-
     private function meta_identified(array|null $originalResults): array
     {
         if (
@@ -21,7 +16,8 @@ trait BaseMetaIdentified
             ! isset($originalResults['meta']['base']) &&
             ! isset($originalResults['meta']['platform_service'])
         ) {
-            throw new AppIdentifier("Unable to identify client application.");
+            report(new AppIdentifier("Unable to identify client application."));
+            abort(403);
         }
 
         if (static::$_UPDATE) $this->reset_meta_identified();
@@ -37,6 +33,11 @@ trait BaseMetaIdentified
 
         session([static::META_IDENTIFIED => $newData]);
         return $newData;
+    }
+
+    private function reset_meta_identified(): void
+    {
+        session()->forget(static::META_IDENTIFIED);
     }
 
     public function environmentBaseMetaChanged(bool $isUpdated): void

@@ -31,7 +31,7 @@ class AssetRequest
         return BaseCrypt::decrypt($data, $this->app->key());
     }
 
-    public function createRequestId(string $routeName, ?string $hspid): void
+    public function createRequestId(?string $routeName, ?string $hspid): void
     {
         try {
             $requestId = $this->app->connection();
@@ -45,7 +45,7 @@ class AssetRequest
         }
     }
 
-    public function createTraceId(string $context): void
+    public function createTraceId(?string $context): void
     {
         try {
             $this->store(static::TRACE_ID, csrf_token() . "::{$context}::" . now()->timestamp); // temporary ...

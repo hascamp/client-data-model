@@ -9,20 +9,12 @@ use Hascamp\Direction\Contracts\Visitor;
 use Hascamp\Direction\Contracts\Accessible;
 use Hascamp\Direction\Builder\Services\Visit;
 use Hascamp\Direction\Contracts\Service\Visitable;
-use Hascamp\Direction\Contracts\Service\Requestion;
 use Hascamp\Direction\Exceptions\VisitIdentification;
-use Hascamp\Direction\Builder\Factory\AssetRequestFactory;
 use Hascamp\Direction\Builder\Master\Stream as BuilderApp;
 
 final class Main extends BuilderApp implements Accessible
 {
-    /** @var \Hascamp\Direction\Contracts\Service\Visitable */
-    private $visit;
-    
-    /** @var \Hascamp\Direction\Builder\Factory\AssetRequestFactory */
-    private $assetFactory;
-
-    public function __construct(Requestion $requestion, array $config)
+    public function __construct(string $requestion, array $config)
     {
         parent::__construct(
             $requestion,
@@ -42,31 +34,17 @@ final class Main extends BuilderApp implements Accessible
             );
         }
 
-        $factory = new AssetRequestFactory;
-        $this->assetFactory = $factory($this->app(), $request->routeAs()->route(), $request->user()?->hspid);
+        $routeName = $request->routeAs()?->route() ?? $request->route()->action['as'];
 
         $this->visit = new Visit(
             $this->app(),
-            $request,
+            $routeName,
             $request->user(),
         );
 
         if ($director instanceof Closure) {
             $director($this);
         }
-    }
-
-    public function hasVisit(): bool
-    {
-        if (
-            $this->visit?->getVisitor() instanceof Visitor &&
-            $this->visit?->getVisited() instanceof Visited &&
-            $this->assetFactory?->requestPermission()
-        ) {
-            return $this->visit?->getVisitor()?->hspid !== null || $this->visit?->getVisited()?->target !== null;
-        }
-
-        return false;
     }
     
     public function visitBuilder(): void
@@ -75,9 +53,22 @@ final class Main extends BuilderApp implements Accessible
         $this->visit->setVisited();
 
         $this->set_visit_access_permission($this->hasVisit());
-        $this->optimize_request_preparation($this->assetFactory->asHeaders(), function ($app) {
+        $this->optimize_request_preparation(function ($app) {
             $this->app = $app; // preset...
         });
+    }
+
+    public function hasVisit(): bool
+    {
+        if (
+            $this->visit?->getVisitor() instanceof Visitor &&
+            $this->visit?->getVisited() instanceof Visited &&
+            $this->visit?->getAssetFactory()?->requestPermission()
+        ) {
+            return $this->visit?->getVisitor()?->hspid !== null || $this->visit?->getVisited()?->target !== null;
+        }
+
+        return false;
     }
     
     public function visit(): Visitable
