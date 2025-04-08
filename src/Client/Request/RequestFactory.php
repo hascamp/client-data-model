@@ -6,13 +6,11 @@ use Closure;
 use Hascamp\Client\Request\Requestion;
 use Hascamp\Client\Contracts\Modelable;
 use Hascamp\Client\Contracts\DataRequest;
+use Hascamp\Direction\Contracts\Accessible;
 
 final class RequestFactory implements DataRequest
 {
     protected static $__requestion;
-
-    /** @var \Closure|array */
-    protected static $headers = [];
 
     public function __construct(
         Requestion $request
@@ -21,22 +19,16 @@ final class RequestFactory implements DataRequest
         static::$__requestion = $request;
     }
 
-    public function optimize(Closure|array $headers): static
+    public function optimize(Accessible $accessible): static
     {
-        static::$headers = $headers;
+        static::$__requestion->setAccessible($accessible);
         return $this;
     }
 
     public function data(string $event, array $data = []): Modelable
     {
-        $headers = static::$headers;
-
-        if ($headers instanceof Closure) {
-            $headers = $headers();
-        }
-
         return static::$__requestion
                 ->process($event)
-                ->request($data, $headers);
+                ->request($data);
     }
 }

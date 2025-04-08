@@ -108,7 +108,7 @@ abstract class Stream
 
     protected function optimize_request_preparation(): void
     {
-        if ($this->request(call:'setHeaderToResource')) {
+        if ($this->request(call:'resourceOptimized')) {
             $this->app->pingInitialized($this->request('call.ping:index'));
         }
     }

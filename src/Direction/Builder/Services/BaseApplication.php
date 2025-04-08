@@ -2,7 +2,6 @@
 
 namespace Hascamp\Direction\Builder\Services;
 
-use Closure;
 use Hascamp\Direction\App\Base;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Direction\App\PlatformService;
@@ -104,8 +103,8 @@ class BaseApplication implements BasePlatform
                 abort(403);
             }
 
-            logger("BASE ===", $meta['base']);
-            logger("PLATFORM_SERVICE ===", $meta['platform_service']);
+            // logger("BASE ===", $meta['base']);
+            // logger("PLATFORM_SERVICE ===", $meta['platform_service']);
             static::$base = Base::from($meta['base']);
             static::$platformService = PlatformService::from($meta['platform_service']);
         }

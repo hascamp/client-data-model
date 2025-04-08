@@ -10,8 +10,6 @@ class Ping extends DataModel implements Modelable
     public function __construct(
         public readonly array $connection = [],
         public readonly array $documentations = [],
-        public readonly array $base = [],
-        public readonly array $platform_service = [],
     )
     {
         parent::__construct();
@@ -19,6 +17,6 @@ class Ping extends DataModel implements Modelable
 
     public function index(): static
     {
-        return $this->connection('get', 'ping');
+        return $this->connectionWithProxy('get', 'ping');
     }
 }

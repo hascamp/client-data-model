@@ -5,9 +5,13 @@ namespace Hascamp\Client\Request;
 use Closure;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
+use Hascamp\Direction\Contracts\Accessible;
 
 final class Requestion
 {
+    /** @var \Hascamp\Direction\Contracts\Accessible */
+    protected $accessible;
+
     /** @var string */
     private static $__rootModel;
 
@@ -30,6 +34,24 @@ final class Requestion
     public function setConfig(array $config): void
     {
         static::$__rootModel = $config['resource_namespace'] ?? "";
+    }
+
+    public function setAccessible(Accessible $accessible): void
+    {
+        $this->accessible = $accessible;
+    }
+
+    public function asHeaders(): Closure
+    {
+        return function () {
+            return [
+                'User-Agent' => $this->accessible->app()->userAgent(),
+                'X-App-ID' => $this->accessible->app()->id(),
+                'X-Request-ID' => $this->accessible->getFactory()->requestId(),
+                'X-Trace-ID' => $this->accessible->getFactory()->traceId(),
+                'Authorization' => "Bearer 123456789",
+            ];
+        };
     }
 
     public function model(): ?string
@@ -113,7 +135,7 @@ final class Requestion
         return $this;
     }
 
-    public function request(array $data, array $headers): Modelable
+    public function request(array $data): Modelable
     {
         try {
 
@@ -122,7 +144,14 @@ final class Requestion
                 throw new \Exception("Error Processing Request: {$this->model()} invalid model.");
             }
 
-            $instance->requestion($data, $headers);
+            $headers = function (Closure|array $headers) {
+                if ($headers instanceof Closure) {
+                    $headers = $headers();
+                }
+                return $headers;
+            };
+
+            $instance->requestion($this->modelRequest, $data, $headers($this->asHeaders()));
             return $instance->{$this->method()}();
             
         } finally {

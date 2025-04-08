@@ -2,7 +2,6 @@
 
 namespace Hascamp\Direction\Builder\Services;
 
-use Closure;
 use Hascamp\Client\Resource;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\DataRequest;
@@ -25,29 +24,9 @@ class Request implements Requestion
         return $this->{$call}($event, $data);
     }
 
-    public function asHeaders(): Closure
+    private function resourceOptimized(): bool
     {
-        return function () {
-            return [
-                'User-Agent' => $this->accessible->app()->userAgent(),
-                'X-App-ID' => $this->accessible->app()->id(),
-                'X-Request-ID' => $this->accessible->getFactory()->requestId(),
-                'X-Trace-ID' => $this->accessible->getFactory()->traceId(),
-                'Authorization' => "Bearer 123456789",
-            ];
-        };
-    }
-
-    private function setHeaderToResource(): bool
-    {
-        try {
-            $dataRequest = Resource::optimize($this->asHeaders());
-            return $dataRequest instanceof DataRequest;
-        } catch (\Throwable $e) {
-            report(new RequestionFailed($e->getMessage()));
-        }
-
-        return false;
+        return Resource::optimize($this->accessible) instanceof DataRequest;
     }
 
     private function resource(string $event, array $data): DataModel

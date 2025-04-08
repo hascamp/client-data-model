@@ -7,9 +7,14 @@ use Throwable;
 use Jet\Request\Client;
 use Spatie\LaravelData\Data;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Jet\Request\Client\Contracts\Requestionable;
+use Hascamp\Client\Exceptions\DataClientResourceFailed;
 
 abstract class DataModel extends Data
 {
+    protected string $requestModel = "";
     protected array $dataForm = [];
     protected array $headers = [];
 
@@ -20,62 +25,96 @@ abstract class DataModel extends Data
     )
     {}
 
-    public function requestion($data, $headers)
+    protected array $original_data_results = [];
+
+    public function requestion($event, $data, $headers)
     {
+        $this->requestModel = $event;
         $this->dataForm = $data;
         $this->headers = $headers;
     }
-
-    /**
-     * Original Data Results
-     * 
-     * @var array
-     */
-    protected array $original_data_results = [];
     
-    final protected function connection(string $method, string $url = "", ?Closure $results = null): static
+    final protected function connection(string $method, string $url, Closure|array|null $results = null): static
     {
-        $response = Client::request($this->dataForm, function ($request) use ($method, $url) {
-            $request
-            ->method($method)
-            ->url($url)
-            ->header($this->headers);
-        });
-
-        $_dataResults = function (array $results) {
-            if (count($results) === 1 && isset($results['results'])) {
-                return $results['results'];
-            }
-            else if (count($results) > 1 && isset($results['results'])) {
-                return $results;
-            }
-        };
+        if (is_array($results)) {
+            $response = $results;
+        }
+        else {
+            $response = Client::request($this->dataForm, function ($request) use ($method, $url) {
+                $request
+                ->method($method)
+                ->url($url)
+                ->header($this->headers);
+            });
+        }
 
         if($results === null) {
-            $results = function(array $r) {
+            $results = function($r) {
                 return $r;
             };
         }
 
-        try {
-            
-            $_self = static::from($results($_dataResults($response->getResults('results'))));
-            $_self->original_data_results = $response->getOriginalResults();
-            $_self->successful = $response->getSuccessful();
-            $_self->statusCode = $response->getStatusCode();
-            $_self->message = $response->getMessage();
-            return $_self;
+        return $this->produceToResponse($results($response));
+    }
 
-        } catch (Throwable $e) {
-            Log::error("Error converting Request Client object is not recognized.", [
-                'MESSAGE' => $e->getMessage(),
-                'CODE' => $e->getCode(),
-                '__FILE__' => $e->getFile(),
-                '__LINE__' => $e->getLine(),
-            ]);
+    final protected function connectionWithProxy(string $method, string $url): static
+    {
+        $key = $this->requestModel ."::". (Auth::user()?->hspid ?? '0');
+
+        $cacheable = Cache::remember($key, 3600, function () use ($method, $url) {
+            $response = $this->connection($method, $url, null);
+            if (! $response->successful()) {
+                return null;
+            }
+            return $response->getOriginalResults() ?? [];
+        });
+
+        if (! $cacheable) {
+            report(new DataClientResourceFailed("Connection With Proxy failed.", [
+                'request_model' => $this->requestModel
+            ]));
+            $cacheable = [];
         }
 
-        return static::from($results([]));
+        return $this->produceToResponse($cacheable);
+    }
+
+    protected function produceToResponse(Requestionable|array $response): static
+    {
+        $_dataResults = function (array $results) {
+            if (isset($results['results'])) {
+                return $results['results'];
+            }
+            else {
+                return $results;
+            }
+        };
+
+        try {
+
+            if ($response instanceof Requestionable) {
+                $_self = static::from($_dataResults($response->getResults('results')));
+                $_self->original_data_results = $response->getOriginalResults();
+                $_self->successful = $response->getSuccessful();
+                $_self->statusCode = $response->getStatusCode();
+                $_self->message = $response->getMessage();
+            }
+            else if (is_array($response)) {
+                $_self = static::from($_dataResults($response));
+                $_self->original_data_results = $response;
+                if (isset($response['successful'])) $_self->successful = $response['successful'];
+                if (isset($response['statusCode'])) $_self->statusCode = $response['statusCode'];
+                if (isset($response['message'])) $_self->message = $response['message'];
+            }
+            else {
+                $_self = $this->from([]);
+            }
+            
+        } catch (Throwable $e) {
+            report(new DataClientResourceFailed("Error converting Request Client object is not recognized."));
+        }
+
+        return $_self;
     }
 
     public function successful(): bool
