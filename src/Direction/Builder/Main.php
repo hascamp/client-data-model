@@ -49,7 +49,6 @@ final class Main extends BuilderApp implements Accessible
         };
 
         $this->visit = new Visit(
-            $this->app(),
             $routeName($request),
             $request->user(),
         );
@@ -64,8 +63,9 @@ final class Main extends BuilderApp implements Accessible
         $this->visit->setVisitor();
         $this->visit->setVisited();
 
-        $this->set_visit_access_permission($this->hasVisit());
+        $this->setFactory();
         $this->optimize_request_preparation();
+        $this->set_visit_access_permission($this->hasVisit());
     }
 
     public function hasVisit(): bool
@@ -73,7 +73,7 @@ final class Main extends BuilderApp implements Accessible
         if (
             $this->visit?->getVisitor() instanceof Visitor &&
             $this->visit?->getVisited() instanceof Visited &&
-            $this->visit?->getAssetFactory()?->requestPermission()
+            $this->getFactory()?->requestPermission()
         ) {
             return $this->visit?->getVisitor()?->hspid !== null || $this->visit?->getVisited()?->target !== null;
         }

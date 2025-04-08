@@ -2,15 +2,12 @@
 
 namespace Hascamp\Direction\Builder\Services;
 
-use Closure;
 use Hascamp\Client\Models\User;
 use Hascamp\Direction\Contracts\Visited;
 use Hascamp\Direction\Contracts\Visitor;
 use Hascamp\Direction\Builder\DataVisited;
 use Hascamp\Direction\Builder\DataVisitor;
 use Hascamp\Direction\Contracts\Service\Visitable;
-use Hascamp\Direction\Builder\Factory\AssetRequestFactory;
-use Hascamp\Direction\Contracts\Service\Platform\BasePlatform;
 
 class Visit implements Visitable
 {
@@ -20,12 +17,19 @@ class Visit implements Visitable
     /** @var \Hascamp\Direction\Contracts\Visited */
     protected $visited;
 
+    /** @var \Hascamp\Direction\Builder\Factory\AssetRequestFactory */
+    protected static $factory;
+
     public function __construct(
-        private BasePlatform $app,
         private ?string $routeName,
         private ?User $user,
     )
     {}
+
+    public function routeName(): ?string
+    {
+        return $this->routeName;
+    }
 
     public function setVisitor(): void
     {
@@ -56,11 +60,5 @@ class Visit implements Visitable
     public function getVisited(): Visited
     {
         return $this->visited;
-    }
-
-    public function getAssetFactory(): AssetRequestFactory
-    {
-        $factory = new AssetRequestFactory;
-        return $factory($this->app, $this->routeName, $this->user?->hspid);
     }
 }

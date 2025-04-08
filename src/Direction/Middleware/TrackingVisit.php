@@ -19,9 +19,10 @@ class TrackingVisit
             abort(403);
         }
 
+        $request->direction()->request('call.ping:index');
         // session()->forget('_BASE_META_IDENTIFIED');
         // dd(session()->all());
-        $request->direction()->request('call.ping:index');
+        // dd($request->direction()->request('call.ping:index'));
         return $next($request);
     }
 }

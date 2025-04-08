@@ -3,9 +3,8 @@
 namespace Hascamp\Direction\Builder\Factory;
 
 use Closure;
-use Hascamp\Direction\Exceptions\VisitIdentification;
 use Hascamp\Direction\Contracts\Service\Platform\BasePlatform;
-use Hascamp\Direction\Exceptions\AssetRequestFactoryIdentifier;
+use Hascamp\Direction\Contracts\Service\Visitable;
 
 final class AssetRequestFactory
 {
@@ -18,15 +17,15 @@ final class AssetRequestFactory
     /** @var bool */
     private $requestPermission = false;
 
-    public function __invoke(BasePlatform $app, ?string $routeName, ?string $hspid)
+    public function __invoke(BasePlatform $app, Visitable $visit)
     {
         if (! static::$self instanceof AssetRequestFactory) {
             static::$self = new self();
         }
 
         static::$self->assets = new AssetRequest($app);
-        static::$self->assets->createRequestId($routeName, $hspid);
-        static::$self->assets->createTraceId($routeName);
+        static::$self->assets->createRequestId($visit->routeName(), $visit->getVisitor()->hspid);
+        static::$self->assets->createTraceId($visit->routeName());
         $this->set_request_permission();
 
         return static::$self;
@@ -60,10 +59,5 @@ final class AssetRequestFactory
     public function traceId(): string
     {
         return static::$self->assets->traceId();
-    }
-
-    public function asHeaders(): Closure
-    {
-        return static::$self->assets->asHeaders();
     }
 }

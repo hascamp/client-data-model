@@ -11,6 +11,7 @@ use Hascamp\Direction\Contracts\Service\Visitable;
 use Hascamp\Direction\Exceptions\RequestionFailed;
 use Hascamp\Direction\Contracts\Service\Requestion;
 use Hascamp\Direction\Exceptions\VisitIdentification;
+use Hascamp\Direction\Builder\Factory\AssetRequestFactory;
 use Hascamp\Direction\Contracts\Service\Platform\BasePlatform;
 
 abstract class Stream
@@ -29,6 +30,9 @@ abstract class Stream
 
     /** @var \Hascamp\Direction\Contracts\Service\Visitable */
     protected $visit;
+
+    /** @var \Hascamp\Direction\Builder\Factory\AssetRequestFactory */
+    protected static $factory;
 
     public function __construct(
         string $requestion,
@@ -88,27 +92,36 @@ abstract class Stream
             throw new RequestionFailed("Unable to handle client request.");
         }
 
-        $instanceRequest->setHeader($this->visit->getAssetFactory()->asHeaders());
+        // $instanceRequest->setHeader($this->getFactory()->asHeaders());
         return $instanceRequest;
+    }
+
+    protected function setFactory(): void
+    {
+        $factory = new AssetRequestFactory;
+        static::$factory = $factory($this->app, $this->visit);
+    }
+
+    public function getFactory(): AssetRequestFactory
+    {
+        return static::$factory;
     }
 
     protected function optimize_request_preparation(): void
     {
-        $hasDataModel = function (bool $has) {
-            if ($has) {
-                return $this->app->getMetaIdentified();
-            }
-            return $this->request('call.ping:index');
-        };
-
         if ($this->request(call:'setHeaderToResource')) {
-            $this->app->pingInitialized($hasDataModel($this->app->hasMetaIdentified()));
+            $this->app->pingInitialized($this->request('call.ping:index'));
         }
     }
 
     public function app(): BasePlatform
     {
         return $this->app;
+    }
+
+    public function visit(): Visitable
+    {
+        return $this->visit;
     }
 
     public function request(string $event = "", array $data = [], string $call = "resource"): DataModel|bool

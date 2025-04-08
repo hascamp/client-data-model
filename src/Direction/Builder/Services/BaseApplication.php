@@ -7,13 +7,10 @@ use Hascamp\Direction\App\Base;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Direction\App\PlatformService;
 use Hascamp\Direction\Exceptions\AppIdentifier;
-use Hascamp\Direction\Supports\BaseMetaIdentified;
 use Hascamp\Direction\Contracts\Service\Platform\BasePlatform;
 
 class BaseApplication implements BasePlatform
 {
-    use BaseMetaIdentified;
-
     private static $id;
     private static $key;
     private static $connection;
@@ -79,9 +76,9 @@ class BaseApplication implements BasePlatform
         return null;
     }
 
-    public function pingInitialized(DataModel|array $ping): void
+    public function pingInitialized(DataModel|array $ping): static
     {
-        $originalResults = null;
+        $originalResults = [];
 
         if ($ping instanceof DataModel) {
             $originalResults = $ping->successful() ? $ping->getOriginalResults() : null;
@@ -90,18 +87,30 @@ class BaseApplication implements BasePlatform
             $originalResults = $ping;
         }
 
-        $meta = $this->meta_identified($originalResults);
+        if (
+            ! isset($originalResults['meta']['base']) &&
+            ! isset($originalResults['meta']['platform_service'])
+        ) {
+            report(new AppIdentifier("Unable to identify client application."));
+            abort(403);
+        }
+
+        $meta = $originalResults['meta'];
+
         if ($meta) {
             
             if ($meta['base']['id'] !== $this->id()) {
                 report(new AppIdentifier("Unable to identify client application."));
-                $this->reset_meta_identified();
                 abort(403);
             }
 
+            logger("BASE ===", $meta['base']);
+            logger("PLATFORM_SERVICE ===", $meta['platform_service']);
             static::$base = Base::from($meta['base']);
             static::$platformService = PlatformService::from($meta['platform_service']);
         }
+
+        return $this;
     }
 
     public function base(): Base
@@ -116,16 +125,11 @@ class BaseApplication implements BasePlatform
 
     public function userAgent(): string
     {
-        return $this->user_agent_generate(static::$base, static::$platformService);
+        return $this->toUserAgentGenerate(static::$base, static::$platformService);
     }
 
-    private function user_agent_generate(Base $base, PlatformService $platformService): ?string
+    private function toUserAgentGenerate(Base $base, PlatformService $platformService): ?string
     {
-        $result = $base->initial;
-        $result .= "/{$base->version}";
-        $result .= " (Released:{$base->release_id}) ";
-        $result .= str_replace(' ', '', $platformService->name) . "/{$platformService->base_license_type_of}";
-
-        return (string) $result;
+        return (string) "{$base->initial}/{$base->version} {$platformService->toAgent()}";
     }
 }

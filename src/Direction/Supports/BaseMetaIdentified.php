@@ -9,21 +9,20 @@ trait BaseMetaIdentified
     private const META_IDENTIFIED = "_BASE_META_IDENTIFIED";
     private static $_UPDATE = false;
 
-    private function meta_identified(array|null $originalResults): array
+    private function meta_identified(array $originalResults): array
     {
+        if (static::$_UPDATE) $this->reset_meta_identified();
+
+        if ($this->hasMetaIdentified()) {
+            return session(static::META_IDENTIFIED);
+        }
+
         if (
-            $originalResults === null &&
             ! isset($originalResults['meta']['base']) &&
             ! isset($originalResults['meta']['platform_service'])
         ) {
             report(new AppIdentifier("Unable to identify client application."));
             abort(403);
-        }
-
-        if (static::$_UPDATE) $this->reset_meta_identified();
-
-        if ($this->hasMetaIdentified()) {
-            return session(static::META_IDENTIFIED);
         }
 
         $newData = [

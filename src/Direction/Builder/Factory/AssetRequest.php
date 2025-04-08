@@ -70,7 +70,7 @@ class AssetRequest
             throw new AssetRequestFactoryIdentifier();
         }
 
-        return session(static::REQUEST_ID);
+        return session(static::REQUEST_ID, "");
     }
 
     public function traceId(): string
@@ -79,28 +79,6 @@ class AssetRequest
             throw new AssetRequestFactoryIdentifier();
         }
 
-        return session(static::TRACE_ID);
-    }
-
-    public function asHeaders(): \Closure
-    {
-        try {
-            $requestId = $this->requestId();
-            $traceId = $this->traceId();
-        } catch (\Throwable $th) {
-            report(new AssetRequestFactoryIdentifier());
-            $requestId = null;
-            $traceId = null;
-        }
-        
-        return function () use ($requestId, $traceId) {
-            return [
-                'User-Agent' => $this->app->userAgent(),
-                'X-App-ID' => $this->app->id(),
-                'X-Request-ID' => $requestId,
-                'X-Trace-ID' => $traceId,
-                'Authorization' => "Bearer 123456789",
-            ];
-        };
+        return session(static::TRACE_ID, "");
     }
 }

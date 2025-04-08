@@ -10,9 +10,9 @@ class Base extends Data
         public readonly ?string $id = null,
         public readonly ?string $name = "Ekatalog Marketing Studio",
         public readonly ?string $initial = "EMS",
-        public readonly ?string $type_of = "run",
-        public readonly ?string $release_id = "0",
-        public readonly ?string $version = "0",
+        public readonly ?string $type_of = "call.ping",
+        public readonly ?string $release_id = null,
+        public readonly ?string $version = "Ping",
         public readonly int $vin = 0,
     )
     {}

@@ -15,37 +15,33 @@ class Request implements Requestion
     /** @var \Hascamp\Direction\Contracts\Accessible */
     protected $accessible;
 
-    /** @var \Closure|array */
-    protected $headers = [];
-
-    public function setHeader(Closure $headers): void
-    {
-        $this->headers = $headers;
-    }
-
-    private function headers(): Closure|array
-    {
-        return $this->headers;
-    }
-
     public function __invoke(Accessible $accessible, string $call, string $event, array $data)
     {
         if (! method_exists($this, $call)) {
             throw new RequestionFailed("{$call} not Found.");
         }
 
-        try {
-            $this->accessible = $accessible;
-            return $this->{$call}($event, $data);
-        } finally {
-            $this->accessible = null;
-        }
+        $this->accessible = $accessible;
+        return $this->{$call}($event, $data);
+    }
+
+    public function asHeaders(): Closure
+    {
+        return function () {
+            return [
+                'User-Agent' => $this->accessible->app()->userAgent(),
+                'X-App-ID' => $this->accessible->app()->id(),
+                'X-Request-ID' => $this->accessible->getFactory()->requestId(),
+                'X-Trace-ID' => $this->accessible->getFactory()->traceId(),
+                'Authorization' => "Bearer 123456789",
+            ];
+        };
     }
 
     private function setHeaderToResource(): bool
     {
         try {
-            $dataRequest = Resource::optimize($this->headers());
+            $dataRequest = Resource::optimize($this->asHeaders());
             return $dataRequest instanceof DataRequest;
         } catch (\Throwable $e) {
             report(new RequestionFailed($e->getMessage()));
