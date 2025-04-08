@@ -22,7 +22,7 @@ class TrackingVisit
         $request->direction()->request('call.ping:index');
         // session()->forget('_BASE_META_IDENTIFIED');
         // dd(session()->all());
-        // dd($request->direction()->request('call.ping:index'));
+        // dd($request->direction());
         return $next($request);
     }
 }

@@ -16,4 +16,18 @@ class Base extends Data
         public readonly int $vin = 0,
     )
     {}
+
+    public function isAlready(): bool
+    {
+        if (! empty($this->id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function toAgent(): string
+    {
+        return "{$this->initial}/{$this->version} ({$this->type_of})";
+    }
 }

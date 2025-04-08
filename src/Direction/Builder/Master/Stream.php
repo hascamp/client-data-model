@@ -92,7 +92,6 @@ abstract class Stream
             throw new RequestionFailed("Unable to handle client request.");
         }
 
-        // $instanceRequest->setHeader($this->getFactory()->asHeaders());
         return $instanceRequest;
     }
 

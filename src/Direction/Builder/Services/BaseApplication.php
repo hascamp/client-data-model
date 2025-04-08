@@ -130,6 +130,6 @@ class BaseApplication implements BasePlatform
 
     private function toUserAgentGenerate(Base $base, PlatformService $platformService): ?string
     {
-        return (string) "{$base->initial}/{$base->version} {$platformService->toAgent()}";
+        return (string) "{$base->toAgent()} {$platformService->toAgent()}";
     }
 }

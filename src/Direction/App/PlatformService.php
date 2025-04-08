@@ -14,12 +14,21 @@ class PlatformService extends Data
     )
     {}
 
-    public function toAgent(): string
+    public function isAlready(): bool
     {
         if (! empty($this->id)) {
-            return str_replace(' ', '', $this->name) . "/{$this->id}-{$this->base_license_type_of}";
+            return true;
         }
 
-        return str_replace(' ', '-', config('app.name')) . "/0-null";
+        return false;
+    }
+
+    public function toAgent(): string
+    {
+        if ($this->isAlready()) {
+            return str_replace(' ', '', $this->name) . "/{$this->base_license_type_of}-{$this->id}";
+        }
+
+        return str_replace(' ', '-', config('app.name')) . "/null-0";
     }
 }
