@@ -83,6 +83,7 @@ class BaseApplication implements BasePlatform
             $originalResults = $ping->successful() ? $ping->getOriginalResults() : null;
         }
         else if (is_array($ping)) {
+            logger("==pingInitialized TEST", $ping);
             $originalResults = $ping;
         }
 

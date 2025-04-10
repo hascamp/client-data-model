@@ -19,4 +19,9 @@ class Ping extends DataModel implements Modelable
     {
         return $this->connectionWithProxy('get', 'ping');
     }
+
+    public function trace(): static
+    {
+        return $this->connection('get', 'ping/trace');
+    }
 }

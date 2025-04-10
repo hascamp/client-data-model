@@ -19,10 +19,10 @@ class TrackingVisit
             abort(403);
         }
 
-        // dd($request->direction()->request('call.ping:index'));
         // session()->forget('_BASE_META_IDENTIFIED');
         // dd(session()->all());
         // dd($request->direction());
+        // $request->direction()->request('call.ping:trace', ['url' => $request->fullUrl()]);
         return $next($request);
     }
 }
