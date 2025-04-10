@@ -6,7 +6,6 @@ use Closure;
 use Throwable;
 use Jet\Request\Client;
 use Spatie\LaravelData\Data;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Jet\Request\Client\Contracts\Requestionable;
@@ -33,6 +32,15 @@ abstract class DataModel extends Data
         $this->dataForm = $data;
         $this->headers = $headers;
     }
+
+    protected function getRequestions(): array
+    {
+        return [
+            'requestModel' => $this->requestModel ?? "",
+            'dataForm' => $this->dataForm ?? [],
+            'headers' => $this->headers ?? [],
+        ];
+    }
     
     final protected function connection(string $method, string $url, Closure|array|null $results = null): static
     {
@@ -54,7 +62,7 @@ abstract class DataModel extends Data
             };
         }
 
-        return $this->produceToResponse($results($response));
+        return $this->produceToResponse($results($response), $this->getRequestions());
     }
 
     final protected function connectionWithProxy(string $method, string $url): static
@@ -76,10 +84,10 @@ abstract class DataModel extends Data
             $cacheable = [];
         }
 
-        return $this->produceToResponse($cacheable);
+        return $this->produceToResponse($cacheable, $this->getRequestions());
     }
 
-    protected function produceToResponse(Requestionable|array $response): static
+    protected function produceToResponse(Requestionable|array $response, array $optionals = []): static
     {
         $_dataResults = function (array $results) {
             if (isset($results['results'])) {
@@ -107,7 +115,13 @@ abstract class DataModel extends Data
                 if (isset($response['message'])) $_self->message = $response['message'];
             }
             else {
-                $_self = $this->from([]);
+                $_self = static::from([]);
+            }
+
+            foreach ($optionals as $key => $value) {
+                if (property_exists($this, $key)) {
+                    $_self->{$key} = $value;
+                }
             }
             
         } catch (Throwable $e) {
