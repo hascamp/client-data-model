@@ -88,7 +88,8 @@ class BaseApplication implements BasePlatform
         }
 
         if (
-            ! isset($originalResults['meta']['base']) &&
+            ! isset($originalResults['meta']['env']) &&
+            ! isset($originalResults['meta']['master_platform']) &&
             ! isset($originalResults['meta']['platform_service'])
         ) {
             report(new AppIdentifier("Unable to identify client application."));
@@ -99,14 +100,13 @@ class BaseApplication implements BasePlatform
 
         if ($meta) {
             
-            if ($meta['base']['id'] !== $this->id()) {
+            if (! $meta['env']['id'] === $this->id()) {
                 report(new AppIdentifier("Unable to identify client application."));
+                \Illuminate\Support\Facades\Cache::forget('call.ping:index');
                 abort(403);
             }
 
-            // logger("BASE ===", $meta['base']);
-            // logger("PLATFORM_SERVICE ===", $meta['platform_service']);
-            static::$base = Base::from($meta['base']);
+            static::$base = Base::from($meta['master_platform']);
             static::$platformService = PlatformService::from($meta['platform_service']);
         }
 

@@ -13,9 +13,14 @@ use Hascamp\Client\Exceptions\DataClientResourceFailed;
 
 abstract class DataModel extends Data
 {
-    protected string $requestModel = "";
-    protected array $dataForm = [];
-    protected array $headers = [];
+    /** @var string */
+    protected $requestModel = "";
+
+    /** @var array */
+    protected $dataForm = [];
+
+    /** @var array */
+    protected $headers = [];
 
     public function __construct(
         protected bool $successful = false,
@@ -26,7 +31,7 @@ abstract class DataModel extends Data
 
     protected array $original_data_results = [];
 
-    public function requestion($event, $data, $headers)
+    public function requestion(string $event, array $data, array $headers)
     {
         $this->requestModel = $event;
         $this->dataForm = $data;
@@ -65,11 +70,16 @@ abstract class DataModel extends Data
         return $this->produceToResponse($results($response), $this->getRequestions());
     }
 
-    final protected function connectionWithProxy(string $method, string $url): static
+    final protected function connectionWithProxy(string $method, string $url, ?string $key = null): static
     {
-        $key = $this->requestModel ."::". (Auth::user()?->hspid ?? '0');
+        $__key = function (?string $key) {
+            if (empty($key)) {
+                return $this->requestModel ."::". (Auth::user()?->hspid ?? '0');
+            }
+            return $key;
+        };
 
-        $cacheable = Cache::remember($key, 3600, function () use ($method, $url) {
+        $cacheable = Cache::remember($__key($key), 3600, function () use ($method, $url) {
             $response = $this->connection($method, $url, null);
             if (! $response->successful()) {
                 return null;

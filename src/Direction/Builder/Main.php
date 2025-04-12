@@ -66,6 +66,8 @@ final class Main extends BuilderApp implements Accessible
         $this->setFactory();
         $this->optimize_request_preparation();
         $this->set_visit_access_permission($this->hasVisit());
+        
+        $this->request('call.ping:trace');
     }
 
     public function hasVisit(): bool

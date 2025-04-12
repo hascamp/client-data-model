@@ -2,8 +2,10 @@
 
 namespace Hascamp\Client\Resources\Call;
 
+use Illuminate\Support\Facades\Cache;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
+use Hascamp\Direction\Contracts\Accessible;
 
 class Ping extends DataModel implements Modelable
 {
@@ -17,7 +19,7 @@ class Ping extends DataModel implements Modelable
 
     public function index(): static
     {
-        return $this->connectionWithProxy('get', 'ping');
+        return $this->connectionWithProxy('get', 'ping', $this->requestModel);
     }
 
     public function trace(): static
