@@ -79,6 +79,11 @@ class BaseApplication implements BasePlatform
     {
         $originalResults = [];
 
+        if(! $ping->successful()) {
+            report(new AppIdentifier(code:$ping->statusCode()));
+            abort($ping->statusCode());
+        }
+
         if ($ping instanceof DataModel) {
             $originalResults = $ping->successful() ? $ping->getOriginalResults() : null;
         }
@@ -103,7 +108,7 @@ class BaseApplication implements BasePlatform
             if (! $meta['env']['id'] === $this->id()) {
                 report(new AppIdentifier("Unable to identify client application."));
                 \Illuminate\Support\Facades\Cache::forget('call.ping:index');
-                abort(403);
+                abort(401);
             }
 
             static::$base = Base::from($meta['master_platform']);

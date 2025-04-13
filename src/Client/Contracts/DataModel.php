@@ -70,7 +70,7 @@ abstract class DataModel extends Data
         return $this->produceToResponse($results($response), $this->getRequestions());
     }
 
-    final protected function connectionWithProxy(string $method, string $url, ?string $key = null): static
+    final protected function connectionWithProxy(string $method, string $url, ?string $key = null, int $expires = 3600): static
     {
         $__key = function (?string $key) {
             if (empty($key)) {
@@ -79,13 +79,16 @@ abstract class DataModel extends Data
             return $key;
         };
 
-        $cacheable = Cache::remember($__key($key), 3600, function () use ($method, $url) {
+        if (! Cache::has($__key($key))) {
             $response = $this->connection($method, $url, null);
-            if (! $response->successful()) {
-                return null;
+            if ($response->successful()) {
+                Cache::put($__key($key), $response->getOriginalResults(), $expires);
             }
-            return $response->getOriginalResults() ?? [];
-        });
+            return $response;
+        }
+        else {
+            $cacheable = Cache::get($__key($key), []);
+        }
 
         if (! $cacheable) {
             report(new DataClientResourceFailed("Connection With Proxy failed.", [
