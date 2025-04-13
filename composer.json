@@ -4,12 +4,6 @@
     "type": "library",
     "description": "Data manager for clients (EMS License).",
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "path",
-            "url": "F:/Repositories/farizhuzairi/jet-request"
-        }
-    ],
     "support": {
         "issues": "https://github.com/farizhuzairi/ems-client-model/issues",
         "source": "https://github.com/farizhuzairi/ems-client-model"
@@ -22,7 +16,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "farizhuzairi/jet-request": "1.x-dev",
+        "farizhuzairi/jet-request": "1.1.0",
         "farizhuzairi/routing": "^1.x-dev",
         "hascamp/laravel-exceptions": "1.0.0",
         "spatie/laravel-data": "^4.13"
