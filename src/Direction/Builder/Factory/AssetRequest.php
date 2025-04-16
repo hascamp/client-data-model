@@ -11,10 +11,14 @@ class AssetRequest
     const REQUEST_ID = "request_id";
     const TRACE_ID = "trace_id";
 
+    protected $stamp;
+
     public function __construct(
         private BasePlatform $app
     )
-    {}
+    {
+        $this->stamp = now()->timestamp;
+    }
 
     private function store(string $key, string $data): void
     {
@@ -37,7 +41,7 @@ class AssetRequest
             $requestId = $this->app->connection();
             $requestId .= "|{$hspid}";
             $requestId .= "|{$routeName}";
-            $requestId .= "|" . now()->timestamp;
+            $requestId .= "|{$this->stamp}";
     
             $this->store(static::REQUEST_ID, $this->generate($requestId));
         } catch (\Throwable $th) {
@@ -45,10 +49,14 @@ class AssetRequest
         }
     }
 
-    public function createTraceId(?string $context): void
+    public function createTraceId(?string $routeName): void
     {
         try {
-            $this->store(static::TRACE_ID, csrf_token() . "::{$context}::" . now()->timestamp); // temporary ...
+            $traceId = csrf_token();
+            $traceId .= "::{$routeName}";
+            $traceId .= $this->stamp;
+
+            $this->store(static::TRACE_ID, $traceId); // temporary ...
         } catch (\Throwable $th) {
             report(new AssetRequestFactoryIdentifier($th->getMessage()));
         }

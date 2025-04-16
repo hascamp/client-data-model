@@ -46,10 +46,10 @@ final class Requestion
         return function () {
             return [
                 'User-Agent' => $this->accessible->app()->userAgent(),
-                'X-App-ID' => $this->accessible->app()->id(),
-                'X-Request-ID' => $this->accessible->getFactory()->requestId(),
-                'X-Trace-ID' => $this->accessible->getFactory()->traceId(),
-                // 'Authorization' => "Bearer 7e4e544f-1575-440e-a7fd-2655f715b0e2",
+                'Hascha-App-ID' => $this->accessible->app()->id(),
+                'Hascha-Request-ID' => $this->accessible->getFactory()->requestId(),
+                'Hascha-Trace-ID' => $this->accessible->getFactory()->traceId(),
+                'Hascha-Visited' => null,
             ];
         };
     }
