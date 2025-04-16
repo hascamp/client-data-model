@@ -14,17 +14,10 @@
             "email": "farizhuzairi@gmail.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "path",
-            "url": "F:/Repositories/farizhuzairi/basetheme"
-        }
-    ],
     "require": {
         "php": "^8.2",
         "hascamp/basecrypt": "^2.0",
         "hascamp/laravel-exceptions": "^1.0",
-        "farizhuzairi/basetheme": "dev-main",
         "farizhuzairi/jet-request": "^1.1",
         "farizhuzairi/routing": "^1.x-dev",
         "spatie/laravel-data": "^4.13"
