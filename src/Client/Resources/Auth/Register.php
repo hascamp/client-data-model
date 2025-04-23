@@ -14,6 +14,13 @@ class Register extends DataModel implements Modelable
         parent::__construct();
     }
 
+    protected function visibility(): array
+    {
+        return [
+            'user',
+        ];
+    }
+
     public function newUser(): static
     {
         return $this->connection('post', 'auth/register');

@@ -2,10 +2,8 @@
 
 namespace Hascamp\Client\Resources\Call;
 
-use Illuminate\Support\Facades\Cache;
 use Hascamp\Client\Contracts\DataModel;
 use Hascamp\Client\Contracts\Modelable;
-use Hascamp\Direction\Contracts\Accessible;
 
 class Ping extends DataModel implements Modelable
 {
@@ -15,6 +13,14 @@ class Ping extends DataModel implements Modelable
     )
     {
         parent::__construct();
+    }
+
+    protected function visibility(): array
+    {
+        return [
+            'connection',
+            'documentations',
+        ];
     }
 
     public function index(): static

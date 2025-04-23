@@ -33,7 +33,7 @@ class DirectionServiceProvider extends ServiceProvider
     private function register_config(): void
     {
         $this->mergeConfigFrom(
-            __DIR__."/../../config/direction.php", 'direction'
+            __DIR__.'/../../config/direction.php', 'direction'
         );
     }
 
