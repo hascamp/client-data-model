@@ -5,12 +5,12 @@ namespace Hascamp\Direction;
 use Closure;
 use Illuminate\Http\Request;
 use Hascamp\Direction\Builder\Main;
-use Hascamp\Direction\Builder\Services\Request as ServicesRequest;
 use Illuminate\Support\ServiceProvider;
 use Hascamp\Direction\Contracts\Accessible;
 use Hascamp\Direction\Middleware\TrackingVisit;
 use Illuminate\Contracts\Foundation\Application;
 use Hascamp\Direction\Middleware\VisitorsAsClient;
+use Hascamp\Direction\Builder\Services\Request as ServicesRequest;
 
 class DirectionServiceProvider extends ServiceProvider
 {
@@ -27,7 +27,7 @@ class DirectionServiceProvider extends ServiceProvider
     {
         $this->boot_config();
         $this->boot_macro();
-        $this->boot_middleware();
+        $this->boot_middleware($this->app['router']);
     }
 
     private function register_config(): void
@@ -56,9 +56,8 @@ class DirectionServiceProvider extends ServiceProvider
         });
     }
 
-    private function boot_middleware(): void
+    private function boot_middleware($router): void
     {
-        $router = $this->app['router'];
         $router->pushMiddlewareToGroup('web', TrackingVisit::class);
         $router->aliasMiddleware('client', VisitorsAsClient::class);
     }

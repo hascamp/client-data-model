@@ -18,12 +18,22 @@
         {
             "type": "path",
             "url": "F:/Repositories/farizhuzairi/generate-data"
+        },
+        {
+            "type": "path",
+            "url": "F:/Repositories/farizhuzairi/basetheme"
+        },
+        {
+            "type": "path",
+            "url": "F:/Repositories/farizhuzairi/routing"
         }
     ],
     "require": {
         "php": "^8.2",
         "hascamp/basecrypt": "^2.0",
         "hascamp/laravel-exceptions": "^1.0",
+        "farizhuzairi/basetheme": "dev-main",
+        "farizhuzairi/routing": "dev-main",
         "farizhuzairi/jet-request": "^1.1",
         "farizhuzairi/generate-data": "dev-main",
         "spatie/laravel-data": "^4.13"
