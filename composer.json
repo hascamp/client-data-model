@@ -42,9 +42,13 @@
         "orchestra/testbench": "^9.3"
     },
     "autoload": {
+        "files": [
+            "src/Helper/feature_lang.php"
+        ],
         "psr-4": {
             "Hascamp\\Client\\": "src/Client/",
-            "Hascamp\\Direction\\": "src/Direction/"
+            "Hascamp\\Direction\\": "src/Direction/",
+            "Hascamp\\Helper\\": "src/Helper/"
         }
     },
     
